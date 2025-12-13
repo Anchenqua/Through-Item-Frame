@@ -1,78 +1,74 @@
-name: Release Build
+name: Release build
 
 on:
-  workflow_dispatch:  # 手动触发
-    inputs:
-      version_type:
-        description: '版本类型 (release/beta/alpha)'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - release
-          - beta
-          - alpha
-      release_name:
-        description: 'Release标题'
-        required: false
-        default: ''
-        type: string
+  workflow_dispatch
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # 获取完整提交历史，用于生成版本信息
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew build
-
-    - name: List build artifacts
-      run: ls -la build/libs/
-
-    - name: Get version from build
+    - name: Get version from gradle.properties
       id: get_version
       run: |
-        # 从构建产物中提取版本号
-        # 假设jar文件名格式为 modname-version.jar
-        JAR_FILE=$(ls build/libs/*.jar | grep -v sources | grep -v dev | head -1)
-        VERSION=$(echo $JAR_FILE | sed 's/.*-//' | sed 's/\.jar//')
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        # 直接从gradle.properties读取版本
+        if [ -f "gradle.properties" ]; then
+          # 尝试多种可能的属性名
+          VERSION=$(grep -E "^(mod_)?version[ \t]*=" gradle.properties | head -1 | cut -d'=' -f2 | xargs)
+          echo "从gradle.properties读取版本: $VERSION"
+        fi
+        
+        if [ -z "$VERSION" ]; then
+          # 从build.gradle读取
+          VERSION=$(grep -E "version[ \t]*=" build.gradle 2>/dev/null | head -1 | cut -d"'" -f2 | cut -d'"' -f2 | xargs || true)
+          echo "从build.gradle读取版本: $VERSION"
+        fi
+        
+        if [ -z "$VERSION" ]; then
+          # 使用构建号
+          VERSION="1.0.${{ github.run_number }}"
+          echo "使用构建号作为版本: $VERSION"
+        fi
+        
+        # 清理版本号
+        CLEAN_VERSION=$(echo "$VERSION" | sed 's/^[^0-9]*//' | sed 's/[^0-9.]*$//')
+        echo "清理后版本: $CLEAN_VERSION"
+        
+        echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$CLEAN_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Setup Java and Build
+      run: |
+        # 设置Java
+        curl -s "https://get.sdkman.io" | bash
+        source "$HOME/.sdkman/bin/sdkman-init.sh"
+        sdk install java 21.0.4-tem
+        sdk use java 21.0.4-tem
+        
+        # 构建
+        chmod +x ./gradlew
+        ./gradlew build
 
     - name: Create Release
-      id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: v${{ steps.get_version.outputs.version }}
-        name: ${{ github.event.inputs.release_name || format('Release v{0}', steps.get_version.outputs.version) }}
-        draft: false
-        prerelease: ${{ github.event.inputs.version_type != 'release' }}
-        generate_release_notes: true
-        files: |
-          build/libs/*.jar
-          build/libs/*.jar
+        tag_name: ${{ steps.get_version.outputs.tag }}
+        name: "Release ${{ steps.get_version.outputs.tag }}"
         body: |
-          ## 构建信息
-          - **版本:** v${{ steps.get_version.outputs.version }}
-          - **类型:** ${{ github.event.inputs.version_type }}
-          - **构建时间:** ${{ github.event.head_commit.timestamp }}
+          ## Through Item Frame Mod
           
-          ## 产物说明
-          - `*.jar` - 主文件
-          - `*-sources.jar` - 源代码
-          - `*-dev.jar` - 开发版本
+          **版本:** ${{ steps.get_version.outputs.version }}
+          **构建时间:** $(date)
+          
+          ### 包含文件:
+          - 主模组文件
+          - 源代码文件
+        files: build/libs/*.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
