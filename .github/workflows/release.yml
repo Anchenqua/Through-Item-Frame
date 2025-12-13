@@ -1,4 +1,4 @@
-name: Release from gradle.properties
+name: Release build
 
 on:
   workflow_dispatch
