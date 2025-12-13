@@ -1,150 +1,74 @@
-name: Release Build
+name: Release from gradle.properties
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_name:
-        description: 'Release名称'
-        required: false
-        default: ''
-        type: string
-      tag_prefix:
-        description: '标签前缀'
-        required: false
-        default: 'v'
-        type: string
+  workflow_dispatch
 
 permissions:
   contents: write
 
-env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
 jobs:
-  build-and-release:
+  release:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Java 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: 'gradle'
-
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
-
-    - name: Build with Gradle
-      id: build
+    - name: Get version from gradle.properties
+      id: get_version
       run: |
-        ./gradlew build --no-daemon
-        echo "Build completed successfully"
-        # 列出所有构建产物
-        echo "=== Build artifacts ==="
-        find build/libs -name "*.jar" -type f | while read file; do
-          echo "Found: $file"
-        done
-
-    - name: Extract correct version from jar
-      id: extract_version
-      run: |
-        # 查找主jar文件（排除sources）
-        echo "=== 查找主JAR文件 ==="
-        
-        # 列出所有jar文件
-        ALL_JARS=$(find build/libs -name "*.jar" -type f)
-        echo "所有JAR文件:"
-        echo "$ALL_JARS"
-        
-        # 优先选择包含模组名的文件
-        MAIN_JAR=""
-        for jar in $ALL_JARS; do
-          if [[ ! "$jar" =~ sources ]] && [[ ! "$jar" =~ dev ]]; then
-            MAIN_JAR="$jar"
-            break
-          fi
-        done
-        
-        # 如果没有找到，取第一个
-        if [ -z "$MAIN_JAR" ]; then
-          MAIN_JAR=$(echo "$ALL_JARS" | head -1)
+        # 直接从gradle.properties读取版本
+        if [ -f "gradle.properties" ]; then
+          # 尝试多种可能的属性名
+          VERSION=$(grep -E "^(mod_)?version[ \t]*=" gradle.properties | head -1 | cut -d'=' -f2 | xargs)
+          echo "从gradle.properties读取版本: $VERSION"
         fi
         
-        echo "主JAR文件: $MAIN_JAR"
-        echo "main_jar=$MAIN_JAR" >> $GITHUB_OUTPUT
+        if [ -z "$VERSION" ]; then
+          # 从build.gradle读取
+          VERSION=$(grep -E "version[ \t]*=" build.gradle 2>/dev/null | head -1 | cut -d"'" -f2 | cut -d'"' -f2 | xargs || true)
+          echo "从build.gradle读取版本: $VERSION"
+        fi
         
-        # 提取文件名（不含路径和扩展名）
-        FILENAME=$(basename "$MAIN_JAR" .jar)
-        echo "文件名: $FILENAME"
-        
-        # 根据你的文件名格式 ThroughItemFrame-1.0.101-1.21.8-fabric.jar
-        # 提取版本号
-        if [[ "$FILENAME" =~ ThroughItemFrame-(.*)-1\.21\.8-fabric ]]; then
-          VERSION="${BASH_REMATCH[1]}"
-          echo "匹配模式1: $VERSION"
-        elif [[ "$FILENAME" =~ -(1\.0\.[0-9]+) ]]; then
-          VERSION="${BASH_REMATCH[1]}"
-          echo "匹配模式2: $VERSION"
-        elif [[ "$FILENAME" =~ -([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-          VERSION="${BASH_REMATCH[1]}"
-          echo "匹配模式3: $VERSION"
-        else
-          # 使用构建号和日期
+        if [ -z "$VERSION" ]; then
+          # 使用构建号
           VERSION="1.0.${{ github.run_number }}"
-          echo "使用默认版本: $VERSION"
+          echo "使用构建号作为版本: $VERSION"
         fi
         
-        echo "提取的版本号: $VERSION"
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        # 清理版本号
+        CLEAN_VERSION=$(echo "$VERSION" | sed 's/^[^0-9]*//' | sed 's/[^0-9.]*$//')
+        echo "清理后版本: $CLEAN_VERSION"
         
-        # 创建标签（确保是有效的git标签）
-        TAG="${{ github.event.inputs.tag_prefix }}$VERSION"
-        # 清理标签（移除无效字符）
-        CLEAN_TAG=$(echo "$TAG" | sed 's/[^a-zA-Z0-9._-]/-/g')
-        echo "标签: $CLEAN_TAG"
-        echo "tag=$CLEAN_TAG" >> $GITHUB_OUTPUT
+        echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$CLEAN_VERSION" >> $GITHUB_OUTPUT
 
-    - name: Prepare release notes
-      id: prepare_notes
+    - name: Setup Java and Build
       run: |
-        echo "## 🎮 Through Item Frame Mod" > release_notes.md
-        echo "" >> release_notes.md
-        echo "**版本:** ${{ steps.extract_version.outputs.version }}" >> release_notes.md
-        echo "**构建编号:** #${{ github.run_number }}" >> release_notes.md
-        echo "**构建时间:** $(date '+%Y-%m-%d %H:%M:%S')" >> release_notes.md
-        echo "**Minecraft 版本:** 1.21.8" >> release_notes.md
-        echo "**Loader:** Fabric" >> release_notes.md
-        echo "" >> release_notes.md
-        echo "### 📦 包含文件:" >> release_notes.md
+        # 设置Java
+        curl -s "https://get.sdkman.io" | bash
+        source "$HOME/.sdkman/bin/sdkman-init.sh"
+        sdk install java 21.0.4-tem
+        sdk use java 21.0.4-tem
         
-        # 列出所有要上传的文件
-        find build/libs -name "*.jar" -type f | while read file; do
-          filename=$(basename "$file")
-          size=$(du -h "$file" | cut -f1)
-          echo "- \`$filename\` ($size)" >> release_notes.md
-        done
-        
-        echo "" >> release_notes.md
-        echo "### 🔧 安装说明:" >> release_notes.md
-        echo "1. 下载 \`ThroughItemFrame-${{ steps.extract_version.outputs.version }}-1.21.8-fabric.jar\`" >> release_notes.md
-        echo "2. 放入 Minecraft 的 \`mods\` 文件夹" >> release_notes.md
-        echo "3. 确保已安装 Fabric Loader" >> release_notes.md
+        # 构建
+        chmod +x ./gradlew
+        ./gradlew build
 
-    - name: Create GitHub Release
+    - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.extract_version.outputs.tag }}
-        name: ${{ github.event.inputs.release_name || format('Through Item Frame v{0}', steps.extract_version.outputs.version) }}
-        body_path: release_notes.md
-        draft: false
-        prerelease: false
-        files: |
-          build/libs/ThroughItemFrame-*.jar
-          build/libs/through-item-frame-*.jar
-        fail_on_unmatched_files: false  # 防止文件不存在时报错
+        tag_name: ${{ steps.get_version.outputs.tag }}
+        name: "Release ${{ steps.get_version.outputs.tag }}"
+        body: |
+          ## Through Item Frame Mod
+          
+          **版本:** ${{ steps.get_version.outputs.version }}
+          **构建时间:** $(date)
+          
+          ### 包含文件:
+          - 主模组文件
+          - 源代码文件
+        files: build/libs/*.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
