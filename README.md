@@ -25,7 +25,16 @@
 ```
 
 
+
+## 前置
+[@Mod Menu](https://modrinth.com/mod/modmenu/): >=15.0.0
+[@Cloth Config API](https://modrinth.com/mod/cloth-config): >=19.0.147
+[@Fabric API](https://modrinth.com/mod/fabric-api/): >=0.136.1
+
+
+
 ## 附录
+需要Fabric版本>=0.16.1
 应该没有bug吧？（大概）
 
 
