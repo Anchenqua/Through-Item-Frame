@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "through-item-frame",
+	"version": "${version}",
+	"name": "Through Item Frame",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"AnChen_qua"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC-BY-NC-4.0",
+	"icon": "assets/through-item-frame/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.anchenqua.throughitemframe.ThroughItemFrame"
+		],
+		"client": [
+			"com.anchenqua.throughitemframe.ThroughItemFrameClient"
+		],
+        "modmenu": [
+            "com.anchenqua.throughitemframe.ModMenuIntegration"
+        ]
+	},
+	"mixins": [
+		"through-item-frame.mixins.json",
+		{
+			"config": "through-item-frame.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.1",
+		"minecraft": "~1.21.8",
+		"java": ">=21",
+		"fabric-api": "*",
+        "modmenu": ">=15.0.0",
+        "cloth-config":">=19.0.147"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

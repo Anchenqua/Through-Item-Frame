@@ -1,0 +1,7 @@
+{
+  "text.autoconfig.itemframecontainer.title": "ItemFrame Container Opener",
+  "text.autoconfig.itemframecontainer.option.enabled": "Enable Container Opening",
+  "text.autoconfig.itemframecontainer.option.enabled.@Tooltip": "When enabled, right-clicking item frames with items will open containers behind them.\n\n- Hold Shift + Right Click to rotate items\n- Left Click to take items\n- Works with all vanilla containers",
+  "modmenu.nameTranslation.through-item-frame": "ItemFrame Container Opener",
+  "modmenu.descriptionTranslation.through-item-frame": "A lightweight client-side mod that allows you to open containers behind item frames with a simple right-click."
+}

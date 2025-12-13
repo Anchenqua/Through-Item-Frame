@@ -1,0 +1,7 @@
+{
+  "text.autoconfig.itemframecontainer.title": "物品展示框容器开启器",
+  "text.autoconfig.itemframecontainer.option.enabled": "启用容器开启功能",
+  "text.autoconfig.itemframecontainer.option.enabled.@Tooltip": "启用后，右键点击带有物品的展示框会打开后方的容器。\n\n- 按住 Shift + 右键旋转物品\n- 左键取下物品\n- 支持所有原版容器",
+  "modmenu.nameTranslation.through-item-frame": "无视物品展示框",
+  "modmenu.descriptionTranslation.through-item-frame": "一个轻量级客户端 Mod，允许你通过简单右键打开物品展示框后方的容器。"
+}
