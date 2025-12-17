@@ -54,9 +54,9 @@ public class ItemFrameHandler {
         Direction face = itemFrame.getHorizontalFacing().getOpposite();
 
         Vec3d hitPos = new Vec3d(
-                containerPos.getX() + 0.5 + face.getUnitVector().x * 0.5,
-                containerPos.getY() + 0.5 + face.getUnitVector().y * 0.5,
-                containerPos.getZ() + 0.5 + face.getUnitVector().z * 0.5
+                containerPos.getX() + 0.5 + face.getOffsetX() * 0.5,
+                containerPos.getY() + 0.5 + face.getOffsetY() * 0.5,
+                containerPos.getZ() + 0.5 + face.getOffsetZ() * 0.5
         );
 
         BlockHitResult blockHit = new BlockHitResult(
