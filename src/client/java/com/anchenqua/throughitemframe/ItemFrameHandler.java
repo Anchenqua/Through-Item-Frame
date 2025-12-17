@@ -3,6 +3,7 @@ package com.anchenqua.throughitemframe;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ActionResult;
@@ -51,6 +52,8 @@ public class ItemFrameHandler {
             BlockPos containerPos
     ) {
         MinecraftClient client = MinecraftClient.getInstance();
+        ClientWorld world = client.world;
+        if (world == null) return;
         Direction face = itemFrame.getHorizontalFacing().getOpposite();
 
         Vec3d hitPos = new Vec3d(
@@ -69,6 +72,7 @@ public class ItemFrameHandler {
         if (client.interactionManager != null) {
             client.interactionManager.interactBlock(
                     player,
+                    world,
                     hand,
                     blockHit
             );
