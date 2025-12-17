@@ -64,8 +64,8 @@ jobs:
           body: |
             ## Through Item Frame Mod
             
-            **版本:** ${{ steps.get_version.outputs.version }}
-            **游戏版本:** ${{ steps.get_version.outputs.minecraft_version }}
+            **mod版本:** ${{ steps.get_version.outputs.version }}
+            **构建游戏版本:** ${{ steps.get_version.outputs.minecraft_version }}
             
             ### 包含文件:
             - 主模组文件
