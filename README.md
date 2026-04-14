@@ -57,7 +57,7 @@ v1.0.104
 
 ## 反馈
 
-发现bug或需要新功能请发布  [@Issues](https://github.com/Anchenqua/Through-Item-Frame/issues)
+发现bug或需要新功能请发布  [Issues](https://github.com/Anchenqua/Through-Item-Frame/issues)
 
 
 ## 证书
