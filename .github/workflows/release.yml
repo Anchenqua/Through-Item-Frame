@@ -49,8 +49,8 @@ jobs:
           # 设置Java
           curl -s "https://get.sdkman.io" | bash
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install java 21.0.4-tem
-          sdk use java 21.0.4-tem
+          sdk install java 25.0.2-tem
+          sdk use java 25.0.2-tem
           
           # 构建
           chmod +x ./gradlew
