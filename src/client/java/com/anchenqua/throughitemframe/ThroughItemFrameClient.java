@@ -26,7 +26,6 @@ public class ThroughItemFrameClient implements ClientModInitializer {
         ModConfig.init();
         KeyBind.register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // 使用官方文档推荐的 while 循环处理点击
             while (KeyBind.TOGGLE_KEY.consumeClick()) {
                 ModConfig config = ModConfig.getInstance();
                 config.enabled = !config.enabled;

@@ -18,11 +18,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ItemFrameHandler {
 
-    /**
-     * UseEntityCallback 的事件处理方法
-     */
     public static InteractionResult onUseEntity(Player player, Level world, InteractionHand hand, Entity entity, EntityHitResult hitResult) {
-        // 仅处理客户端逻辑
         if (world.isClientSide() && player instanceof LocalPlayer localPlayer) {
             return handleClientInteraction(localPlayer, world, hand, entity);
         }
@@ -30,12 +26,10 @@ public class ItemFrameHandler {
     }
 
     private static InteractionResult handleClientInteraction(LocalPlayer player, Level world, InteractionHand hand, Entity entity) {
-        // 检查配置开关
         if (!ModConfig.getInstance().enabled) {
             return InteractionResult.PASS;
         }
 
-        // 必须是主手、非潜行、目标是物品展示框且框内有物品
         if (hand != InteractionHand.MAIN_HAND || player.isShiftKeyDown()) {
             return InteractionResult.PASS;
         }
@@ -44,7 +38,6 @@ public class ItemFrameHandler {
             return InteractionResult.PASS;
         }
 
-        // 尝试打开容器
         return tryOpenContainerBehind(player, itemFrame, hand);
     }
 
@@ -53,7 +46,6 @@ public class ItemFrameHandler {
         Level world = client.level;
         if (world == null) return InteractionResult.PASS;
 
-        // 获取展示框背面的方块坐标
         Direction facing = itemFrame.getDirection();
         BlockPos attachedPos = itemFrame.blockPosition().relative(facing.getOpposite());
 
@@ -64,7 +56,6 @@ public class ItemFrameHandler {
             return InteractionResult.PASS;
         }
 
-        // 通过伪造 BlockHitResult 来打开容器
         openContainer(player, hand, facing, attachedPos);
         return InteractionResult.CONSUME;
     }
@@ -81,7 +72,6 @@ public class ItemFrameHandler {
 
         BlockHitResult blockHit = new BlockHitResult(hitPos, clickFace, containerPos, false);
 
-        // 新版 Minecraft 中 useItemOn 签名可能变化，这里使用正确的 Mojang 映射调用
         if (client.gameMode != null) {
             client.gameMode.useItemOn(player, hand, blockHit);
         }
