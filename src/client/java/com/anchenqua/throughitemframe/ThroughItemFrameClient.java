@@ -15,17 +15,35 @@ package com.anchenqua.throughitemframe;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.util.ActionResult;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 
 public class ThroughItemFrameClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
         ModConfig.init();
+        KeyBind.register();
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            // 使用官方文档推荐的 while 循环处理点击
+            while (KeyBind.TOGGLE_KEY.consumeClick()) {
+                ModConfig config = ModConfig.getInstance();
+                config.enabled = !config.enabled;
+                AutoConfig.getConfigHolder(ModConfig.class).save();
 
+                if (client.player != null) {
+                    Component message = Component.translatable(
+                            config.enabled ? "message.throughitemframe.enabled" : "message.throughitemframe.disabled"
+                    );
+                    client.player.sendSystemMessage(message);
+                }
+            }
+        });
         AutoConfig.getConfigHolder(ModConfig.class).registerSaveListener((manager, config) -> {
             System.out.println("[ItemFrameContainer] Config saved: enabled=" + config.enabled);
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
+        UseEntityCallback.EVENT.register(ItemFrameHandler::onUseEntity);
 	}
 }

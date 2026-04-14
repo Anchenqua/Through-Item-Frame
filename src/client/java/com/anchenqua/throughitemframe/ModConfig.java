@@ -11,6 +11,8 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean enabled = true;
 
+    @ConfigEntry.Gui.Excluded
+    public int toggleKeyCode = -1;
     public static void init() {
         AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
     }
