@@ -13,7 +13,7 @@
 
 ## 作者
 
-- [@AnChen_qua](https://github.com/Anchenqua)
+- [AnChen_qua](https://github.com/Anchenqua)
 
 ## 版本号说明
 v1.0.104
@@ -33,9 +33,9 @@ v1.0.104
 
 
 ## 前置
-[@Mod Menu](https://modrinth.com/mod/modmenu/)      
-[@Cloth Config API](https://modrinth.com/mod/cloth-config)      
-[@Fabric API](https://modrinth.com/mod/fabric-api/)
+[Mod Menu](https://modrinth.com/mod/modmenu/)      
+[Cloth Config API](https://modrinth.com/mod/cloth-config)      
+[Fabric API](https://modrinth.com/mod/fabric-api/)
 
 
 
