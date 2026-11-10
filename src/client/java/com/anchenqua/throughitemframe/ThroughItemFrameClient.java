@@ -13,10 +13,11 @@
  */
 package com.anchenqua.throughitemframe;
 
+import com.anchenqua.throughitemframe.compat.FastItemFramesCompat;
+
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 
@@ -24,6 +25,7 @@ public class ThroughItemFrameClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
         ModConfig.init();
+        FastItemFramesCompat.register();
         KeyBind.register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (KeyBind.TOGGLE_KEY.consumeClick()) {
@@ -43,6 +45,5 @@ public class ThroughItemFrameClient implements ClientModInitializer {
             System.out.println("[ItemFrameContainer] Config saved: enabled=" + config.enabled);
             return InteractionResult.SUCCESS;
         });
-        UseEntityCallback.EVENT.register(ItemFrameHandler::onUseEntity);
 	}
 }

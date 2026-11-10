@@ -13,7 +13,7 @@
 	},
 	"license": "CC-BY-NC-4.0",
 	"icon": "assets/through-item-frame/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"com.anchenqua.throughitemframe.ThroughItemFrame"
@@ -26,6 +26,10 @@
         ]
 	},
 	"mixins": [
+		{
+			"config": "through-item-frame.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"depends": {
 		"fabricloader": ">=0.16.1",
