@@ -4,7 +4,10 @@
   "package": "com.anchenqua.throughitemframe.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ClientPlayerInteractionManagerMixin"
+    "ClientPlayerInteractionManagerMixin",
+    "PlayerInteractionMixin",
+    "MinecraftClientAttackMixin",
+    "EntityShiftMixin"
   ],
   "injectors": {
     "defaultRequire": 1
