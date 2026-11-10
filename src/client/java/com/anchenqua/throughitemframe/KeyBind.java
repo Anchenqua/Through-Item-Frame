@@ -17,7 +17,7 @@ public class KeyBind {
             new KeyMapping(
                     "key.throughitemframe.toggle",
                     InputConstants.Type.KEYBOARD,
-                    GLFW.GLFW_KEY_UNKNOWN,
+                    GLFW.GLFW_KEY_F6,
                     CATEGORY
             )
     );
