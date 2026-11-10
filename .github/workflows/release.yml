@@ -99,3 +99,39 @@ jobs:
           files: artifacts/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ secrets.MODRINTH_PROJECT_ID }}
+          MOD_VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          if [ -z "$MODRINTH_TOKEN" ] || [ -z "$MODRINTH_PROJECT_ID" ]; then
+            echo "MODRINTH_TOKEN / MODRINTH_PROJECT_ID 未配置，跳过 Modrinth 上传"
+            exit 0
+          fi
+
+          set -e
+          for JAR in artifacts/*.jar; do
+            GAME=$(basename "$JAR" | sed -E 's/.*-([0-9][0-9.]*)-fabric\.jar/\1/')
+            if [ -z "$GAME" ]; then
+              echo "跳过无法识别游戏版本的文件: $JAR"
+              continue
+            fi
+
+            VERSION_NUMBER="${MOD_VERSION}+${GAME}"
+            echo "=== 上传 ${VERSION_NUMBER} (${JAR}) ==="
+
+            jq -n \
+              --arg name "Through Item Frame ${MOD_VERSION} for ${GAME}" \
+              --arg vn "$VERSION_NUMBER" \
+              --arg gv "$GAME" \
+              --arg pid "$MODRINTH_PROJECT_ID" \
+              '{name:$name,version_number:$vn,version_type:"release",game_versions:[$gv],loaders:["fabric"],featured:false,status:"listed",project_id:$pid,dependencies:[],file_parts:["file"]}' > /tmp/modrinth-data.json
+
+            curl -fsS -X POST "https://api.modrinth.com/v2/version" \
+              -H "Authorization: Bearer $MODRINTH_TOKEN" \
+              -F "data=@/tmp/modrinth-data.json;type=application/json" \
+              -F "file=@${JAR};type=application/java-archive"
+            echo ""
+          done
