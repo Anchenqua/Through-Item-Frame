@@ -4,7 +4,7 @@
 
 · 纯客户端 mod，无需服务器支持
 
-![Logo](https://github.com/Anchenqua/Through-Item-Frame/blob/v1.1.0-26.1-fabric/src/main/resources/assets/through-item-frame/icon.png?raw=true)
+![Logo](https://github.com/Anchenqua/Through-Item-Frame/blob/26.1-fabric/src/main/resources/assets/through-item-frame/icon.png?raw=true)
 
 ## 作者
 
@@ -16,7 +16,7 @@ v1.1.0
 
 - `1.1.0` —— mod 版本号
 - 游戏版本通过构建产物名和分支名区分，例如 `ThroughItemFrame-1.1.0-26.1-fabric.jar`
-- 分支命名规则：`v<mod版本>-<游戏版本>-fabric`
+- 分支命名规则：`<游戏版本>-fabric`
 
 ## 构建
 
