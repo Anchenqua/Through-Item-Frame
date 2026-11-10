@@ -4,11 +4,11 @@
   "package": "com.anchenqua.throughitemframe.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "PlayerInteractionMixin",`n    "InputConstantsMixin",
+    "PlayerInteractionMixin",
     "MinecraftAttackMixin",
     "EntityShiftMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }
