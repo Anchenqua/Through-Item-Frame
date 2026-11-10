@@ -13,6 +13,8 @@
  */
 package com.anchenqua.throughitemframe;
 
+import com.anchenqua.throughitemframe.compat.FastItemFramesCompat;
+
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.util.ActionResult;
@@ -22,6 +24,7 @@ public class ThroughItemFrameClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
         ModConfig.init();
+        FastItemFramesCompat.register();
 
         AutoConfig.getConfigHolder(ModConfig.class).registerSaveListener((manager, config) -> {
             System.out.println("[ItemFrameContainer] Config saved: enabled=" + config.enabled);
