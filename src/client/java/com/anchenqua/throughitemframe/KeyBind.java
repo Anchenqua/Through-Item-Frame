@@ -16,7 +16,7 @@ public class KeyBind {
     public static final KeyMapping TOGGLE_KEY = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.throughitemframe.toggle",
-                    InputConstants.Type.KEYSYM,
+                    InputConstants.Type.KEYBOARD,
                     GLFW.GLFW_KEY_UNKNOWN,
                     CATEGORY
             )
