@@ -64,7 +64,7 @@ jobs:
               continue
             fi
 
-            BRANCH="v${MOD_VERSION}-${VERSION}-fabric"
+            BRANCH="${VERSION}-fabric"
             echo "=== Building ${VERSION} from ${BRANCH} ==="
             git checkout "origin/${BRANCH}"
 
